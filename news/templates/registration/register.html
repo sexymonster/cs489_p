@@ -1,0 +1,24 @@
+{% extends "news/base.html" %}
+
+{% block content %}
+    {{error}}
+    <form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+        <table>
+        <tr>
+            Username :
+            <br>
+            <input name="username" type="text">
+            <br>
+        </tr>
+        <tr>
+            Password:
+            <br>
+            <input name="password" type="password">
+            <br>
+        </tr>
+        </table>
+
+        <input type="submit" value="register" />
+    </form>
+{% endblock %}

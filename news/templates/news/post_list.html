@@ -1,0 +1,50 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+    <div class = "left-box">
+        {% for post in posts %}
+            <div class="post">
+                <div class="date">
+                    {{ post.published_date }}
+                </div>
+                <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
+                <p>{{ post.picture|linebreaksbr|truncatewords:20 }}</p>
+            </div>
+        {% endfor %}
+        <!--{ % if posts.has_previous %}-->
+        <!--<a href="page=1">맨 앞으로</a>-->
+        <!--<a href="?page={{posts.previous_page_number}}">이전으로</a>-->
+        <!--{ % endif %}-->
+        <!--<span> {{posts.number}}</span>-->
+        <!--<span>/</span>-->
+        <!--<span>{{posts.paginator.num_pages}}</span>-->
+        <!--{% if posts.has_next %}-->
+        <!--<a href="?page={{posts.next_page_number}}">다음으로</a>-->
+        <!--<a href="?page={{posts.paginator.num_pages}}">맨 뒤로</a>-->
+        <!--{% else}-->
+        <!--<a href="?page={{posts.next_page_number}}">다음으로</a>-->
+        <!--<a href="?page={{posts.paginator.num_pages}}">맨 뒤로</a>-->
+        <!--{% endif %}-->
+
+    </div>
+    <div class = "right-box">
+        <h2>-you might prefer-</h2>
+        {% for recommand in recommands_prefer %}
+            <div class="post">
+                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+            </div>
+        {% endfor %}
+        <h2>-you might haven't seen-</h2>
+        {% for recommand in recommands_disprefer %}
+            <div class="post">
+                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+            </div>
+        {% endfor %}
+        <h2>-the most controversial-</h2>
+        {% for recommand in recommands_controversial %}
+            <div class="post">
+                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

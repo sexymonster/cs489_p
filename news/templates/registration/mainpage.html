@@ -1,0 +1,8 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<div class="container">
+    <a href="{% url 'login' %}" class="top-menu"><button type="submit" class="save btn btn-default">login</button></a>
+    <a href="{% url 'register' %}" class="top-menu"><button type="submit" class="save btn btn-default">register</button></a>
+</div>
+{% endblock %}
