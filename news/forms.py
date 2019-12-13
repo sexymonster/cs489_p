@@ -5,7 +5,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'picture','type',)
+        fields = ('title', 'text','type','author')
 
 class RatingForm(forms.ModelForm):
 

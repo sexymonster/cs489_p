@@ -8,9 +8,9 @@ class Post(models.Model):
     #post된 news들
 
     title = models.CharField(max_length=200)
-    picture = models.TextField()
+    text = models.TextField()
     type = models.CharField(max_length=200)
-
+    author = models.CharField(max_length=200)
 
     created_date = models.DateTimeField(
             default=timezone.now)
