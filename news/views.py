@@ -23,7 +23,7 @@ def login(request):
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('post_list', pk=1)
+            return redirect('post_list')
         else:
             return render(request, 'registration/login.html', {'error':'username or password is incorrect'})
     return render(request, 'registration/login.html')
@@ -33,7 +33,7 @@ def register(request):
         try :
             user = User.objects.create_user(username=request.POST["username"], password=request.POST["password"])
             auth.login(request, user)
-            return redirect('post_list', pk=1)
+            return redirect('post_list')
         except:
             error = "id is already exist"
             return render(request, 'registration/register.html', {'error':error})
