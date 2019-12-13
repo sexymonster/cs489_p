@@ -1,15 +1,83 @@
 {% extends 'news/base.html' %}
 
+
 {% block content %}
+<script type="text/javascript">
+
+function all_s() {
+        var postA = document.getElementsByClassName("A"); 
+        var postP = document.getElementsByClassName("P");
+        var postT = document.getElementsByClassName("T");   
+        for( var i = 0; i < postA.length; i++ ){ 
+            var a = postA.item(i); 
+            a.style.display = "block";
+            }
+
+        for(i = 0; i < postP.length; i++ ){ 
+            var a = postP.item(i); 
+            a.style.display =  "block";
+        }
+
+        for(i = 0; i < postT.length; i++ ){ 
+            var a = postT.item(i); 
+            a.style.display =  "block";
+        }
+    }
+    
+
+    function all_h() {
+        var postA = document.getElementsByClassName("A"); 
+        var postP = document.getElementsByClassName("P");
+        var postT = document.getElementsByClassName("T");   
+        for( var i = 0; i < postA.length; i++ ){ 
+            var a = postA.item(i); 
+            a.style.display = "none";
+            }
+
+        for(i = 0; i < postP.length; i++ ){ 
+            var a = postP.item(i); 
+            a.style.display =  "none";
+        }
+
+        for(i = 0; i < postT.length; i++ ){ 
+            var a = postT.item(i); 
+            a.style.display =  "none";
+        }
+    }
+    
+    //숨기기
+    function hide_and_show(str) {
+        all_h();
+        var postA = document.getElementsByClassName(str); 
+        for( var i = 0; i < postA.length; i++ ){ 
+            var a = postA.item(i); 
+            a.style.display = "block";
+        }
+
+    }
+
+</script>
+   
+<p id= 'button area'>
+    <input type="button" value="All" onclick="all_s();"/>
+    <input type="button" value="Political" onclick="hide_and_show('P');"/>
+    <input type="button" value="Entertainment" onclick="hide_and_show('A');"/>
+    <input type="button" value="Tech" onclick="hide_and_show('T');"/>
+</p>
+
     <div class = "left-box">
         {% for post in posts %}
-            <div class="post">
+        <div class = "{{post.type}}" style="display: block;">
+            <div class="post" >
                 <div class="date">
                     {{ post.published_date }}
+                    {{ post.author}}  
                 </div>
                 <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-                <p>{{ post.picture|linebreaksbr|truncatewords:20 }}</p>
+                <!-- <img src="../../static/img/{{post.picture}}.jpeg"> -->
+                <p>{{ post.text|linebreaksbr|truncatewords:20 }}</p>
             </div>
+        </div>
         {% endfor %}
         <!--{ % if posts.has_previous %}-->
         <!--<a href="page=1">맨 앞으로</a>-->
@@ -47,4 +115,6 @@
             </div>
         {% endfor %}
     </div>
+
 {% endblock %}
+

@@ -4,14 +4,17 @@
     <div class="post">
         {% if post.published_date %}
             <div class="date">
-                {{ post.published_date }}
+                {{ post.published_date}}
+                {{ post.author}}  
             </div>
         {% endif %}
         <!--<a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>-->
+        
         <h1>{{ post.title }}</h1>
-        <h1>{{ post.type }}</h1>
-        <p>{{ post.picture|linebreaksbr }}</p>
-
+        <br>
+        <!-- <h1>{{ post.type }}</h1> -->
+        <!-- <img src="../../static/img/{{post.picture}}.jpeg"> -->
+        <p>{{ post.text|linebreaksbr }}</p>
         <form method="POST" class="rating-form">{% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">rate_save</button>
