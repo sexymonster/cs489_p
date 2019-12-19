@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post, Rating
+from .models import Post, Rating, Theme
 from django.utils import timezone
-from .forms import PostForm, RatingForm
+from .forms import PostForm, RatingForm, ThemeForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -23,7 +23,7 @@ def login(request):
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('post_detail2', pk=1)
+            return redirect('post_list')
         else:
             return render(request, 'registration/login.html', {'error':'username or password is incorrect'})
     return render(request, 'registration/login.html')
@@ -33,7 +33,7 @@ def register(request):
         try :
             user = User.objects.create_user(username=request.POST["username"], password=request.POST["password"])
             auth.login(request, user)
-            return redirect('post_detail2', pk=1)
+            return redirect('post_list')
         except:
             error = "id is already exist"
             return render(request, 'registration/register.html', {'error':error})
@@ -47,29 +47,112 @@ def logout(request):
 
 @login_required
 def post_list(request):
-    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
 
-    recommands, controversials = rating_expectation(request)
     recommands_pk_list = []
     recommands_pk_list_prefer = []
     recommands_pk_list_disprefer = []
-    if len(recommands) != 0:
-        for i in recommands:
-            recommands_pk_list.append(i[1])
-        if len(recommands_pk_list) > 3:
-            recommands_pk_list_prefer = recommands_pk_list[2:]
-            recommands_pk_list_disprefer = recommands_pk_list[:2]
-        else:
-            recommands_pk_list_prefer = recommands_pk_list
-            recommands_pk_list_disprefer = []
-
     controversial_pk_list = []
-    if len(controversials) != 0:
-        for i in controversials:
-            controversial_pk_list.append(i[0])
-    return render(request, 'news/post_list.html', {'posts':posts, 'recommands_prefer':recommands_pk_list_prefer,
-                                                   'recommands_disprefer':recommands_pk_list_disprefer,
-                                                   'recommands_controversial':controversial_pk_list})
+    print(Post.objects.count())
+    if Post.objects.count() != 0 :
+        posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+        themes = Theme.objects.all()
+        recommands, controversials = rating_expectation(request)
+        if len(recommands) != 0:
+            for i in recommands:
+                recommands_pk_list.append(i[1])
+            if len(recommands_pk_list) > 3:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = recommands_pk_list[:2]
+            else:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = []
+
+
+        if len(controversials) != 0:
+            for i in controversials:
+                controversial_pk_list.append(i[0])
+        print(themes[0].theme_title)
+        return render(request, 'news/post_list.html', {'posts':posts,'themes':themes, 'recommands_prefer':recommands_pk_list_prefer,
+                                                       'recommands_disprefer':recommands_pk_list_disprefer,
+                                                       'recommands_controversial':controversial_pk_list})
+    else:
+        return render(request, 'news/post_list.html', {'posts':[],'themes':[], 'recommands_prefer':recommands_pk_list_prefer,
+                                                       'recommands_disprefer':recommands_pk_list_disprefer,
+                                                       'recommands_controversial':controversial_pk_list})
+@login_required
+def post_list_theme(request, theme='All'):
+    print("theme : ",theme, type(theme))
+    #theme에 포함된 글만 보여주는 것
+    recommands_pk_list = []
+    recommands_pk_list_prefer = []
+    recommands_pk_list_disprefer = []
+    controversial_pk_list = []
+    
+    if Theme.objects.count() == 0:
+        #Theme이나 post가 없거나, theme을 받아온 경우가 아니라면
+        print("theme 0")
+        return render(request, 'news/post_list.html',
+                      {'posts': [], 'themes': [], 'recommands_prefer': recommands_pk_list_prefer,
+                       'recommands_disprefer': recommands_pk_list_disprefer,
+                       'recommands_controversial': controversial_pk_list}
+                      )
+    elif Post.objects.count() == 0:
+        print("post 0")
+        themes = Theme.objects.all()
+        return render(request, 'news/post_list.html',
+                      {'posts': [], 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                       'recommands_disprefer': recommands_pk_list_disprefer,
+                       'recommands_controversial': controversial_pk_list}
+                      )
+    elif theme=='All':
+        print("theme not 0, post not 0")
+        posts = Post.objects.all().order_by('-published_date')
+        themes = Theme.objects.all()
+        recommands, controversials = rating_expectation(request)
+        if len(recommands) != 0:
+            for i in recommands:
+                recommands_pk_list.append(i[1])
+            if len(recommands_pk_list) > 3:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = recommands_pk_list[:2]
+            else:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = []
+
+        if len(controversials) != 0:
+            for i in controversials:
+                controversial_pk_list.append(i[0])
+        return render(request, 'news/post_list.html',
+                      {'posts': posts, 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                       'recommands_disprefer': recommands_pk_list_disprefer,
+                       'recommands_controversial': controversial_pk_list})
+    else:
+        #theme이 All이 아닐 경우
+        theme_obj = Theme.objects.get(theme_title = theme)
+        posts = []
+        themes = Theme.objects.all()
+        if Post.objects.filter(theme=theme_obj).count() != 0:
+            posts = Post.objects.filter(theme=theme_obj).order_by('-published_date')
+        recommands, controversials = rating_expectation(request)
+        if len(recommands) != 0:
+            for i in recommands:
+                recommands_pk_list.append(i[1])
+            if len(recommands_pk_list) > 3:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = recommands_pk_list[:2]
+            else:
+                recommands_pk_list_prefer = recommands_pk_list[2:]
+                recommands_pk_list_disprefer = []
+
+        if len(controversials) != 0:
+            for i in controversials:
+                controversial_pk_list.append(i[0])
+        return render(request, 'news/post_list.html',
+                          {'posts': posts, 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                           'recommands_disprefer': recommands_pk_list_disprefer,
+                           'recommands_controversial': controversial_pk_list})
+    
+
 
 @login_required
 def post_practice(request):
@@ -166,7 +249,7 @@ def getRecommendation(data, person, sim_function=sim_distance):
 
 
 @login_required
-def post_detail(request, pk):
+def post_detail(request, pk, theme):
     post = get_object_or_404(Post, pk=pk)
     now_user = request.user
     form = RatingForm()
@@ -186,7 +269,8 @@ def post_detail(request, pk):
             rating_expectation(request)
 
             # rating_expectation(request, post)
-            return redirect('post_list')
+            print("post_detail theme", theme)
+            return redirect('post_list_theme', theme=theme)
         else :
             rating = Rating.objects.filter(rating_post=post)
             return render(request, 'news/post_detail.html', {'post':post,'rating':rating, 'now_user':now_user, 'form':form})
@@ -196,16 +280,39 @@ def post_detail(request, pk):
 
 @login_required
 def post_new(request):
+    print("function post_new")
     if request.method == "POST": #무언가 받아왔을때
         form = PostForm(request.POST) #form 형태로 reqest.POST로 받아온 값을 준다.
         if form.is_valid():
             post = form.save(commit=False) #form 형태로 저장하지는 마라, 작성자와 작성시간을 더해야하니깐.
             post.published_date = timezone.now()
+            if post.temp_theme != None:
+                print("temp_theme == none", post.temp_theme)
+                Theme.objects.create(theme_title=post.temp_theme,theme_type='ST')
+                post.theme = Theme.objects.get(theme_title = post.temp_theme)
             post.save() #이제 저장해라.
-            return redirect('post_detail', pk=post.pk) #post_detail로 가고, pk=post.pk로 줄께.
+            return redirect('post_detail', theme=post.theme.theme_title,pk=post.pk) #post_detail로 가고, pk=post.pk로 줄께.
     else:
         form = PostForm()
     return render(request, 'news/post_edit.html', {'form':form})
+
+@login_required
+def theme_new(request):
+    print("function theme_new")
+    if request.method == "POST":  # 무언가 받아왔을때
+        form = ThemeForm(request.POST)  # form 형태로 reqest.POST로 받아온 값을 준다.
+        if form.is_valid():
+            theme = form.save(commit=False)  # form 형태로 저장하지는 마라, 작성자와 작성시간을 더해야하니깐.
+            theme.save()  # 이제 저장해라.
+            print("post_list")
+            return redirect('post_list')
+    else:
+        form = ThemeForm()
+        print("news/themne_edit")
+    form = ThemeForm()
+    print("fuck")
+    return render(request, 'news/theme_edit.html', {'form': form})
+
 
 @login_required
 def post_edit(request, pk):

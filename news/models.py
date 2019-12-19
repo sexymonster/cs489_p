@@ -3,13 +3,21 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+class Theme(models.Model):
+    theme_title = models.CharField(max_length=50)
+    TYPE_CHOICES = (('ST', 'Sub_theme'),('MT', 'Main_theme'))
+    theme_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_CHOICES[0]) #0이면 sub_theme, 1이면 main_theme
+
+    def __str__(self):
+        return str(str(self.theme_title) + " /  "+str(self.theme_type))
 
 class Post(models.Model):
     #post된 news들
 
     title = models.CharField(max_length=200)
     text = models.TextField()
-    type = models.CharField(max_length=200)
+    theme = models.ForeignKey(Theme, on_delete=models.CASCADE, null=True, blank=True)
+    temp_theme = models.CharField(max_length=50, null=True, blank=True)
     author = models.CharField(max_length=200)
 
     created_date = models.DateTimeField(
@@ -26,6 +34,8 @@ class Post(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+
 
 #필요 없다.
 class Recommand(models.Model):

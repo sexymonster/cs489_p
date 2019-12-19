@@ -13,12 +13,14 @@
                 <h1><a href="/post">news rec - to post </a>
 
                 <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{% url 'theme_new' %}" class="top-menu"><span class="glyphicon glyphicon-info-sign"></span></a>
                 <a href="{% url 'logout' %}" class="top-menu">Logout</a>
                 <a href="/post" class="top-menu">{{user.username}}</a></h1>
             {% elif user.is_authenticated %}
                 <h1><a href="/post">news rec - to post </a>
 
                 <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{% url 'theme_new' %}" class="top-menu"><span class="glyphicon glyphicon-info-sign"></span></a>
                 <a href="{% url 'logout' %}" class="top-menu">Logout</a>
                 <a href="/post" class="top-menu">{{user.username}}</a></h1>
             {% else %}

@@ -2,78 +2,84 @@
 
 
 {% block content %}
-<script type="text/javascript">
+<!--<script type="text/javascript">-->
 
-function all_s() {
-        var postA = document.getElementsByClassName("A"); 
-        var postP = document.getElementsByClassName("P");
-        var postT = document.getElementsByClassName("T");   
-        for( var i = 0; i < postA.length; i++ ){ 
-            var a = postA.item(i); 
-            a.style.display = "block";
-            }
+<!--function all_s() {-->
+        <!--var postA = document.getElementsByClassName("A"); -->
+        <!--var postP = document.getElementsByClassName("P");-->
+        <!--var postT = document.getElementsByClassName("T");   -->
+        <!--for( var i = 0; i < postA.length; i++ ){ -->
+            <!--var a = postA.item(i); -->
+            <!--a.style.display = "block";-->
+            <!--}-->
 
-        for(i = 0; i < postP.length; i++ ){ 
-            var a = postP.item(i); 
-            a.style.display =  "block";
-        }
+        <!--for(i = 0; i < postP.length; i++ ){ -->
+            <!--var a = postP.item(i); -->
+            <!--a.style.display =  "block";-->
+        <!--}-->
 
-        for(i = 0; i < postT.length; i++ ){ 
-            var a = postT.item(i); 
-            a.style.display =  "block";
-        }
-    }
-    
+        <!--for(i = 0; i < postT.length; i++ ){ -->
+            <!--var a = postT.item(i); -->
+            <!--a.style.display =  "block";-->
+        <!--}-->
+    <!--}-->
+    <!---->
 
-    function all_h() {
-        var postA = document.getElementsByClassName("A"); 
-        var postP = document.getElementsByClassName("P");
-        var postT = document.getElementsByClassName("T");   
-        for( var i = 0; i < postA.length; i++ ){ 
-            var a = postA.item(i); 
-            a.style.display = "none";
-            }
+    <!--function all_h() {-->
+        <!--var postA = document.getElementsByClassName("A"); -->
+        <!--var postP = document.getElementsByClassName("P");-->
+        <!--var postT = document.getElementsByClassName("T");   -->
+        <!--for( var i = 0; i < postA.length; i++ ){ -->
+            <!--var a = postA.item(i); -->
+            <!--a.style.display = "none";-->
+            <!--}-->
 
-        for(i = 0; i < postP.length; i++ ){ 
-            var a = postP.item(i); 
-            a.style.display =  "none";
-        }
+        <!--for(i = 0; i < postP.length; i++ ){ -->
+            <!--var a = postP.item(i); -->
+            <!--a.style.display =  "none";-->
+        <!--}-->
 
-        for(i = 0; i < postT.length; i++ ){ 
-            var a = postT.item(i); 
-            a.style.display =  "none";
-        }
-    }
-    
-    //숨기기
-    function hide_and_show(str) {
-        all_h();
-        var postA = document.getElementsByClassName(str); 
-        for( var i = 0; i < postA.length; i++ ){ 
-            var a = postA.item(i); 
-            a.style.display = "block";
-        }
+        <!--for(i = 0; i < postT.length; i++ ){ -->
+            <!--var a = postT.item(i); -->
+            <!--a.style.display =  "none";-->
+        <!--}-->
+    <!--}-->
+    <!---->
+    <!--//숨기기-->
+    <!--function hide_and_show(str) {-->
+        <!--all_h();-->
+        <!--var postA = document.getElementsByClassName(str); -->
+        <!--for( var i = 0; i < postA.length; i++ ){ -->
+            <!--var a = postA.item(i); -->
+            <!--a.style.display = "block";-->
+        <!--}-->
 
-    }
+    <!--}-->
 
-</script>
-   
-<p id= 'button area'>
-    <input type="button" value="All" onclick="all_s();"/>
-    <input type="button" value="Political" onclick="hide_and_show('P');"/>
-    <input type="button" value="Entertainment" onclick="hide_and_show('A');"/>
-    <input type="button" value="Tech" onclick="hide_and_show('T');"/>
+<!--</script>-->
+   <!---->
+<!--<p id= 'button area'>-->
+    <!--<input type="button" value="All" onclick="all_s();"/>-->
+    <!--<input type="button" value="Political" onclick="hide_and_show('P');"/>-->
+    <!--<input type="button" value="Entertainment" onclick="hide_and_show('A');"/>-->
+    <!--<input type="button" value="Tech" onclick="hide_and_show('T');"/>-->
+<!--</p>-->
+
+<p>
+    {% for theme in themes %}
+        <a href="{% url 'post_list_theme' theme=theme.theme_title %}">{{ theme.theme_title }}</a>
+    {% endfor %}
 </p>
 
     <div class = "left-box">
         {% for post in posts %}
         <div class = "{{post.type}}" style="display: block;">
-            <div class="post" >
+            <div class="post">
                 <div class="date">
                     {{ post.published_date }}
                     {{ post.author}}  
                 </div>
-                <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
+                <h1><a href="{% url 'post_detail' pk=post.pk theme=post.theme.theme_title %}">{{ post.title }}</a></h1>
                 <!-- <img src="../../static/img/{{post.picture}}.jpeg"> -->
                 <p>{{ post.text|linebreaksbr|truncatewords:20 }}</p>
             </div>
@@ -99,19 +105,19 @@ function all_s() {
         <h2>-you might prefer-</h2>
         {% for recommand in recommands_prefer %}
             <div class="post">
-                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+                <h3><a href="{% url 'post_detail' theme=recommand.theme.theme_title pk=recommand.pk %}">{{ recommand.title }}</a></h3>
             </div>
         {% endfor %}
         <h2>-you might haven't seen-</h2>
         {% for recommand in recommands_disprefer %}
             <div class="post">
-                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+                <h3><a href="{% url 'post_detail' theme=recommand.theme.theme_title pk=recommand.pk %}">{{ recommand.title }}</a></h3>
             </div>
         {% endfor %}
         <h2>-the most controversial-</h2>
         {% for recommand in recommands_controversial %}
             <div class="post">
-                <h3><a href="{% url 'post_detail' pk=recommand.pk %}">{{ recommand.title }}</a></h3>
+                <h3><a href="{% url 'post_detail' theme=recommand.theme.theme_title pk=recommand.pk %}">{{ recommand.title }}</a></h3>
             </div>
         {% endfor %}
     </div>
