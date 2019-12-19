@@ -20,5 +20,10 @@
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">rate_save</button>
         </form>
+
+        <div class="delete">
+            <p><a href="{% url 'post_delete' theme=post.theme.theme_title pk=post.pk%}">delete</a></p>
+        </div>
+
     </div>
 {% endblock %}

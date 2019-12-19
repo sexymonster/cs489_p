@@ -296,6 +296,11 @@ def post_new(request):
         form = PostForm()
     return render(request, 'news/post_edit.html', {'form':form})
 
+def post_delete(request, theme, pk):
+    post = Post.objects.get(pk=pk)
+    post.delete()
+    return redirect('post_list')
+
 @login_required
 def theme_new(request):
     print("function theme_new")
