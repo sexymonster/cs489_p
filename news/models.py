@@ -9,13 +9,20 @@ class Post(models.Model):
 
     title = models.CharField(max_length=200)
     text = models.TextField()
-    type = models.CharField(max_length=200)
+    # type = models.CharField(max_length=200)
+    types = [('A','Entertainment'),('T','Technology'),('P','Politics') ]
+
+    type = models.CharField(
+        max_length=200,
+        choices = types,
+    )
     author = models.CharField(max_length=200)
 
     created_date = models.DateTimeField(
             default=timezone.now)
     published_date = models.DateTimeField(
             blank=True, null=True)
+
 
     prating = models.ManyToManyField(User, through='Rating', default=None)
     #없는 값을 default 0하는게 맞나?
