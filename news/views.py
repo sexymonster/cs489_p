@@ -308,14 +308,13 @@ def theme_new(request):
         form = ThemeForm(request.POST)  # form 형태로 reqest.POST로 받아온 값을 준다.
         if form.is_valid():
             theme = form.save(commit=False)  # form 형태로 저장하지는 마라, 작성자와 작성시간을 더해야하니깐.
-            theme.save()  # 이제 저장해라.
-            print("post_list")
-            return redirect('post_list')
-    else:
-        form = ThemeForm()
-        print("news/themne_edit")
+            if Theme.objects.filter(theme_title=theme.theme_title).count() == 0:
+                theme.save()  # 이제 저장해라.
+                return redirect('post_list')
+            else:
+                error = "already exist theme"
+                return render(request, 'news/theme_edit.html', {'form':form,'error':error})
     form = ThemeForm()
-    print("fuck")
     return render(request, 'news/theme_edit.html', {'form': form})
 
 
