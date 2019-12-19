@@ -55,7 +55,8 @@ def post_list(request):
     print(Post.objects.count())
     if Post.objects.count() != 0 :
         posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
-        themes = Theme.objects.all()
+        main_themes = Theme.objects.filter(theme_type='MT')
+        sub_themes = Theme.objects.filter(theme_type='ST')
         recommands, controversials = rating_expectation(request)
         if len(recommands) != 0:
             for i in recommands:
@@ -67,16 +68,16 @@ def post_list(request):
                 recommands_pk_list_prefer = recommands_pk_list[2:]
                 recommands_pk_list_disprefer = []
 
-
         if len(controversials) != 0:
             for i in controversials:
                 controversial_pk_list.append(i[0])
-        print(themes[0].theme_title)
-        return render(request, 'news/post_list.html', {'posts':posts,'themes':themes, 'recommands_prefer':recommands_pk_list_prefer,
+        return render(request, 'news/post_list.html', {'posts':posts,'main_themes':main_themes, 'sub_themes':sub_themes,
+                                                       'recommands_prefer':recommands_pk_list_prefer,
                                                        'recommands_disprefer':recommands_pk_list_disprefer,
                                                        'recommands_controversial':controversial_pk_list})
     else:
-        return render(request, 'news/post_list.html', {'posts':[],'themes':[], 'recommands_prefer':recommands_pk_list_prefer,
+        return render(request, 'news/post_list.html', {'posts':[],'main_themes':[], 'sub_themes':[],
+                                                       'recommands_prefer':recommands_pk_list_prefer,
                                                        'recommands_disprefer':recommands_pk_list_disprefer,
                                                        'recommands_controversial':controversial_pk_list})
 @login_required
@@ -92,22 +93,26 @@ def post_list_theme(request, theme='All'):
         #Theme이나 post가 없거나, theme을 받아온 경우가 아니라면
         print("theme 0")
         return render(request, 'news/post_list.html',
-                      {'posts': [], 'themes': [], 'recommands_prefer': recommands_pk_list_prefer,
+                      {'posts': [], 'main_themes': [], 'sub_themes':[],
+                       'recommands_prefer': recommands_pk_list_prefer,
                        'recommands_disprefer': recommands_pk_list_disprefer,
                        'recommands_controversial': controversial_pk_list}
                       )
     elif Post.objects.count() == 0:
         print("post 0")
-        themes = Theme.objects.all()
+        main_themes = Theme.objects.filter(theme_type='MT')
+        sub_themes = Theme.objects.filter(theme_type='ST')
         return render(request, 'news/post_list.html',
-                      {'posts': [], 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                      {'posts': [], 'main_themes': main_themes, 'sub_themes': sub_themes,
+                       'recommands_prefer': recommands_pk_list_prefer,
                        'recommands_disprefer': recommands_pk_list_disprefer,
                        'recommands_controversial': controversial_pk_list}
                       )
     elif theme=='All':
         print("theme not 0, post not 0")
         posts = Post.objects.all().order_by('-published_date')
-        themes = Theme.objects.all()
+        main_themes = Theme.objects.filter(theme_type='MT')
+        sub_themes = Theme.objects.filter(theme_type='ST')
         recommands, controversials = rating_expectation(request)
         if len(recommands) != 0:
             for i in recommands:
@@ -123,14 +128,16 @@ def post_list_theme(request, theme='All'):
             for i in controversials:
                 controversial_pk_list.append(i[0])
         return render(request, 'news/post_list.html',
-                      {'posts': posts, 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                      {'posts': posts, 'main_themes': main_themes, 'sub_themes': sub_themes,
+                       'recommands_prefer': recommands_pk_list_prefer,
                        'recommands_disprefer': recommands_pk_list_disprefer,
                        'recommands_controversial': controversial_pk_list})
     else:
         #theme이 All이 아닐 경우
         theme_obj = Theme.objects.get(theme_title = theme)
         posts = []
-        themes = Theme.objects.all()
+        main_themes = Theme.objects.filter(theme_type='MT')
+        sub_themes = Theme.objects.filter(theme_type='ST')
         if Post.objects.filter(theme=theme_obj).count() != 0:
             posts = Post.objects.filter(theme=theme_obj).order_by('-published_date')
         recommands, controversials = rating_expectation(request)
@@ -148,7 +155,8 @@ def post_list_theme(request, theme='All'):
             for i in controversials:
                 controversial_pk_list.append(i[0])
         return render(request, 'news/post_list.html',
-                          {'posts': posts, 'themes': themes, 'recommands_prefer': recommands_pk_list_prefer,
+                          {'posts': posts, 'main_themes': main_themes, 'sub_themes':sub_themes,
+                           'recommands_prefer': recommands_pk_list_prefer,
                            'recommands_disprefer': recommands_pk_list_disprefer,
                            'recommands_controversial': controversial_pk_list})
     
@@ -315,8 +323,23 @@ def theme_new(request):
                 error = "already exist theme"
                 return render(request, 'news/theme_edit.html', {'form':form,'error':error})
     form = ThemeForm()
-    return render(request, 'news/theme_edit.html', {'form': form})
+    themes = Theme.objects.all()
+    print("themes", themes)
+    return render(request, 'news/theme_edit.html', {'form': form, 'themes':themes})
 
+def theme_delete(request, theme):
+    temp_theme = Theme.objects.get(theme_title=theme)
+    temp_theme.delete()
+    return redirect('post_list')
+
+def theme_change(request,theme):
+    temp_theme = Theme.objects.get(theme_title=theme)
+    if temp_theme.theme_type == 'MT':
+        temp_theme.theme_type = 'ST'
+    else:
+        temp_theme.theme_type = 'MT'
+    temp_theme.save()
+    return redirect('post_list')
 
 @login_required
 def post_edit(request, pk):
@@ -327,7 +350,7 @@ def post_edit(request, pk):
             post = form.save(commit=False)
             post.published_date = timezone.now()
             post.save()
-            return redirect('post_detail', pk=post.pk)
+            return redirect('post_detail', theme=post.theme.theme_title, pk=post.pk)
     else:
         form = PostForm(instance=post)
     return render(request, 'news/post_edit.html', {'form': form})

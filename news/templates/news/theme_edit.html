@@ -7,4 +7,12 @@
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
+    <h2>theme delete button</h2>
+    {% for theme in themes %}
+        <p><a href="{% url 'theme_delete' theme=theme.theme_title %}">{{ theme.theme_title }}</a></p>
+    {% endfor %}
+    <h2>theme_type change button</h2>
+    {% for theme in themes %}
+        <p><a href="{% url 'theme_change' theme=theme.theme_title %}">{{ theme.theme_title }} - {{theme.get_theme_type_display}}</a></p>
+    {% endfor %}
 {% endblock %}

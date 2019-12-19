@@ -2,6 +2,9 @@
 
 {% block content %}
     <div class="post">
+        <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class = "btn btn-default" href="{% url 'post_delete' theme=post.theme.theme_title pk=post.pk%}">
+            <span class="glyphicon glyphicon-remove-circle"></span></a>
         {% if post.published_date %}
             <div class="date">
                 {{ post.published_date }}
@@ -9,21 +12,17 @@
                 {{ post.theme.theme_title }}
             </div>
         {% endif %}
-        <!--<a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>-->
-        
+
+
         <h1>{{ post.title }}</h1>
         <br>
-        <!-- <h1>{{ post.type }}</h1> -->
-        <!-- <img src="../../static/img/{{post.picture}}.jpeg"> -->
         <p>{{ post.text|linebreaksbr }}</p>
         <form method="POST" class="rating-form">{% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">rate_save</button>
         </form>
 
-        <div class="delete">
-            <p><a href="{% url 'post_delete' theme=post.theme.theme_title pk=post.pk%}">delete</a></p>
-        </div>
+
 
     </div>
 {% endblock %}

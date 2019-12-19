@@ -12,6 +12,8 @@ urlpatterns = [
 
     path('post/new/', views.post_new, name='post_new'),
     path('post/theme_new/', views.theme_new, name='theme_new'),
+    path('post/<str:theme>/delete/', views.theme_delete, name='theme_delete'),
+    path('post/<str:theme>/change/', views.theme_change, name='theme_change'),
     path('post/<str:theme>/', views.post_list_theme, name='post_list_theme'),
     path('post/<str:theme>/<int:pk>/', views.post_detail, name='post_detail'),
     path('post/<str:theme>/<int:pk>/delete/',views.post_delete,name='post_delete'),

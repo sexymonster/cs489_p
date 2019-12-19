@@ -66,9 +66,18 @@
 <!--</p>-->
 
 <p>
-    {% for theme in themes %}
+    <div> Main-Theme :
+    {% for theme in main_themes %}
         <a href="{% url 'post_list_theme' theme=theme.theme_title %}">{{ theme.theme_title }}</a>
     {% endfor %}
+    </div>
+</p>
+<p>
+    <div> Sub-Theme :
+    {% for theme in sub_themes %}
+        <a href="{% url 'post_list_theme' theme=theme.theme_title %}">{{ theme.theme_title }}</a>
+    {% endfor %}
+    </div>
 </p>
 
     <div class = "left-box">
@@ -77,28 +86,14 @@
             <div class="post">
                 <div class="date">
                     {{ post.published_date }}
-                    {{ post.author}}  
+                    {{ post.author }}
+                    {{ post.theme.theme_title }}
                 </div>
                 <h1><a href="{% url 'post_detail' pk=post.pk theme=post.theme.theme_title %}">{{ post.title }}</a></h1>
-                <!-- <img src="../../static/img/{{post.picture}}.jpeg"> -->
                 <p>{{ post.text|linebreaksbr|truncatewords:20 }}</p>
             </div>
         </div>
         {% endfor %}
-        <!--{ % if posts.has_previous %}-->
-        <!--<a href="page=1">맨 앞으로</a>-->
-        <!--<a href="?page={{posts.previous_page_number}}">이전으로</a>-->
-        <!--{ % endif %}-->
-        <!--<span> {{posts.number}}</span>-->
-        <!--<span>/</span>-->
-        <!--<span>{{posts.paginator.num_pages}}</span>-->
-        <!--{% if posts.has_next %}-->
-        <!--<a href="?page={{posts.next_page_number}}">다음으로</a>-->
-        <!--<a href="?page={{posts.paginator.num_pages}}">맨 뒤로</a>-->
-        <!--{% else}-->
-        <!--<a href="?page={{posts.next_page_number}}">다음으로</a>-->
-        <!--<a href="?page={{posts.paginator.num_pages}}">맨 뒤로</a>-->
-        <!--{% endif %}-->
 
     </div>
     <div class = "right-box">
